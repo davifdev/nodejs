@@ -1,31 +1,52 @@
 import { fastify } from 'fastify';
+import { DatabaseMemory } from './database-memory.js';
 
 const app = fastify();
 
-app.get('/', (req, res) => {
+const database = new DatabaseMemory();
+
+app.get('/', () => {
   res.send({ hello: 'world' });
 });
 
-app.get('/videos', (req, res) => {
-  res.send({
-    videos: [
-      { id: 1, title: 'Video 1' },
-      { id: 2, title: 'Video 2' },
-      { id: 3, title: 'Video 3' },
-    ],
-  });
+app.get('/videos', () => {
+  const videos = database.list();
+
+  return videos;
 });
 
 app.post('/videos', (req, res) => {
-  res.send({ video: 'created' });
+  const { title, description, duration } = req.body;
+
+  database.create({
+    title,
+    description,
+    duration,
+  });
+
+  return res.status(201).send();
 });
 
 app.put('/videos/:id', (req, res) => {
-  res.send({ video: 'updated' });
+  const videoId = req.params.id;
+
+  const { title, description, duration } = req.body;
+
+  database.update(videoId, {
+    title,
+    description,
+    duration,
+  });
+
+  return res.status(204).send();
 });
 
 app.delete('/videos/:id', (req, res) => {
-  res.send({ video: 'deleted' });
+  const videoId = req.params.id;
+
+  database.delete(videoId);
+
+  return res.status(204).send();
 });
 
 app.listen({
