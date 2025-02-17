@@ -1,13 +1,33 @@
-import { createServer } from 'node:http';
+import { fastify } from 'fastify';
 
-const server = createServer((req, res) => {
-  res.write('Hello Word, Welcome to Node.js');
-  res.end();
+const app = fastify();
+
+app.get('/', (req, res) => {
+  res.send({ hello: 'world' });
 });
 
-const _PORT = 3000;
-
-server.listen(_PORT, () => {
-  console.log(`Server is running on http://localhost:${_PORT}`);
+app.get('/videos', (req, res) => {
+  res.send({
+    videos: [
+      { id: 1, title: 'Video 1' },
+      { id: 2, title: 'Video 2' },
+      { id: 3, title: 'Video 3' },
+    ],
+  });
 });
 
+app.post('/videos', (req, res) => {
+  res.send({ video: 'created' });
+});
+
+app.put('/videos/:id', (req, res) => {
+  res.send({ video: 'updated' });
+});
+
+app.delete('/videos/:id', (req, res) => {
+  res.send({ video: 'deleted' });
+});
+
+app.listen({
+  port: 3000,
+});
